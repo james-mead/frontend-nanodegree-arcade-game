@@ -27,15 +27,15 @@ Enemy.prototype.update = function(dt) {
         this.x = 0
     }
 
-    // check for collisions between player and enemy
-    if (player.x >= this.x - 30 && player.x <= this.x - 30 && this.y >= player.y - 10 && this.y <= player.y + 10) {
-        console.log('You Loose!')
-        player.reset()
-    } else if (player.x <= 50) {
-        console.log('You won!')
-        player.reset()
-    }
+
+    // Check for collision with enemies or barrier-walls
+    checkCollision(this);
 };
+
+Enemy.prototype.reset = function () {
+    this.x = 0
+    this.y = 58
+}
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
@@ -79,14 +79,36 @@ Player.prototype.handleInput = function (key) {
             break
         case 'up':
             if (this.y > 0) {
-                this.y += 83
+                this.y -= 83
             }
             break
         case 'down':
             if (this.y < 400) {
-                this.y -= 83
+                this.y += 83
             }
             break
+    }
+}
+
+var checkCollision = function (anEnemy) {
+    // check for collision between enemy and player
+    if (
+        player.y + 131 >= anEnemy.y + 90
+        && player.x + 25 <= anEnemy.x + 88
+        && player.y + 73 <= anEnemy.y + 135
+        && player.x + 76 >= anEnemy.x + 11) {
+        console.log('collided');
+        player.reset()
+    }
+
+    // check for player reaching top of canvas and winning the game
+    // if player wins, add 1 to the score and level
+    // pass score as an argument to the increaseDifficulty function
+    if (player.y <= 63) {        
+        console.log('you made it!');
+        score += 1;
+        console.log('current score: ' + score);
+        player.reset()
     }
 }
 
@@ -95,8 +117,11 @@ Player.prototype.handleInput = function (key) {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var allEnemies = [];
-var player = new Player(202.5, 383, 50)
-var enemy = new Enemy(0, Math.random() * 184 + 50, Math.random() * 256)
+var player = new Player(200, 400, 50)
+var score = 0
+for (var i = 0; i < 5; i++) {
+    allEnemies.push(new Enemy(0, Math.floor(Math.random() * 3) * 83 + 58, Math.floor(Math.random() * 100) + 100));
+}
 
 
 // This listens for key presses and sends the keys to your
